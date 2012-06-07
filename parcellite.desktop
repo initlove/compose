@@ -1,0 +1,12 @@
+[Desktop Entry]
+X-SuSE-translate=true
+GenericName=Clipboard Manager
+Name=Parcellite
+Comment=Clipboard Manager
+Comment[zh_CN]=剪切
+Icon=parcellite
+Exec=parcellite
+Terminal=false
+Type=Application
+Categories=GTK;GNOME;Utility;X-SuSE-DesktopUtility;
+
