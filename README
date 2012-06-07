@@ -1,2 +1,17 @@
 compose the named repo
 generate the appdata.xml
+
+
+command:
+1. compose_request: POST: url (or dir) + extra info 
+2. compose_status:  GET:  list: show all the datas
+        1. start.
+        2. failed.
+        3. get archive
+        4. anaylize
+        5. downloading desktop rpms
+        6. generate desktops
+        7. downloading icons rpms
+        8. generate icons dir
+        9. push 
+        10. done.
