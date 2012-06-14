@@ -3,7 +3,7 @@ generate the appdata.xml
 
 
 command:
-1. compose_request: POST: url (or dir) + extra info 
+1. compose_request: POST: url (or dir) + localurl (TODO) + extra info 
 2. compose_status:  GET:  list: show all the datas
         1. start.
         2. failed.
@@ -15,3 +15,7 @@ command:
         8. generate icons dir
         9. push 
         10. done.
+
+
+TODO:
+localurl: if the repo server and appstore server was in the same pc, we can make it faster to generate/get/push

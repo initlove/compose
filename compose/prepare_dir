@@ -1,0 +1,12 @@
+#!/bin/sh
+
+DIR=$1;
+if [ -d $DIR ]; then
+    rm -fr $DIR/*;
+else
+    if [ -e $DIR ]; then
+        rm $DIR;
+    fi
+    mkdir -p $DIR
+fi
+

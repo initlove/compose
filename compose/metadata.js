@@ -1,7 +1,10 @@
 var exec = require('child_process').exec;
 var utils = require('./utils');
+var fs = require('fs');
 var mime = require('mime');
 var mongodb = require('mongodb');
+var Db = mongodb.Db;
+var Server = mongodb.Server;
 var GridStore = require('mongodb').GridStore;
 var EventEmitter = require('events').EventEmitter
 
@@ -209,13 +212,64 @@ exports.get = function(req) {
     return emitter;
 };
 
+
+function save_image(db, filename, path, callback) {
+    var gridStore = new GridStore(db, filename, 'w+');
+    gridStore.open(function(err, gridStore) {
+        if (err) {
+            console.log(err);
+            callback(false, err);
+            return;
+        }
+        fs.readFile(path, function(err, imageData) {
+            if (err) {
+                console.log(err);
+                callback(false, err);
+                return;
+            }
+            gridStore.write(imageData, function(err, gridStore) {
+                if (err) {
+                    callback(false, err);
+                    return;
+                }
+                gridStore.close(function(err, result) {
+                    if (err) {
+                        callback(false, err);
+                        return;
+                    } else {
+                        callback(true);
+                    }
+                });
+            });
+        });
+    });
+};
+
 function push_icons(req, callback) {
-    var dbname="mongodb://127.0.0.1:27017/stock";
-    mongodb.connect(dbname, function(err, connect) {
-                    
-        var gridStore = new GridStore(connect, app.icon, 'w+', {
-            "content_type": mime.lookup(uri),
-            'metadata': {'contentType': mime.lookup(uri)}
+    var icon_dir = utils.data_dir(req.body.base_uri)+"/icon/64";
+
+    var db = new Db('stock', new Server("127.0.0.1", 27017));
+    db.open(function(err, db) {
+        if (err)
+            return callback(false, err);
+        var walker  = walk.walk(icon_dir, { followLinks: false });
+        walker.on('file', function(root, stat, next) {
+            if (stat.name.match(/(png|svg|svgz|jpg|jpeg)$/g)) {
+                var _name = stat.name.split(/\./g);
+                var icon_name = _name[0];
+                GridStore.exist(db, icon_name, function(err, result) {
+                    if (err || !result) {
+                        save_image(db, icon_name, root+'/'+stat.name, function(r, msg){
+                            next();
+                        });
+                    }
+                });
+            };
+        });
+
+        walker.on('end', function() {
+            db.close();
+            callback(true);
         });
     });
 };

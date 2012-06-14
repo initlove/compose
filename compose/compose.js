@@ -21,12 +21,16 @@ function add_repo(req, callback) {
                     var monitor = metadata.get(req);
                     monitor.on('error', function(msg){
                         console.log("error in get metadata: " + msg);
-                    }).on('failed', function(msg) {
+                    });
+                    monitor.on('failed', function(msg) {
                         console.log("fail to get metadata: " + msg);
                         callback(false, msg);
-                    }).on('status', function(msg) {
+                    });
+                    monitor.on('status', function(msg) {
+                        console.log('status changed');
                         exports.status_change(req.body.base_uri, msg);
-                    }).on('done', function(msg) {
+                    });
+                    monitor.on('done', function(msg) {
                         console.log(msg);
                         callback(true);
                     });

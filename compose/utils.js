@@ -35,7 +35,6 @@ exports.download = function(source_url, dest_dir, callback) {
     };
 
     http.get(options, function(res) {
-        console.log(res.statusCode);
         var file = null;
         if (res.statusCode == 200) {
             var file_name = url.parse(source_url).pathname.split('/').pop();
@@ -53,11 +52,3 @@ exports.download = function(source_url, dest_dir, callback) {
         callback(false, e.message);
     });
 };
-
-
-exports.download('http://download.suse.de/full/full-sle11-sp2-x86_64/ChangeLog1', './dl_0011', function(r, msg){
-    if (r) {
-        console.log("we get r");
-    } else
-        console.log(msg);
-});
