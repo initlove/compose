@@ -19,16 +19,18 @@ exports.get_desktop = function(file, doc) {
         } else {
 //            var root = doc.node('applications');
             var elem = libxml.Element(doc, 'application');
-            var node = libxml.Element(doc, 'id', file);
+            var node = libxml.Element(doc, 'id', file.split('/').pop());
             node.attr({'type': 'desktop'});
             elem.addChild(node);
             for (var key in item) {
-                if (key == 'Categories'|| key == 'Mimetypes') {
+                if (key == 'Categories'|| key == 'Mimetype') {
                     var _child_key = null;
-                    if (key == 'Categories')
+                    if (key == 'Categories') {
                         _child_key = 'category';
-                    else
+                    } else {
+                        key = "Mimetypes";
                         _child_key = 'mimetype';
+                    }
 
                     var node = libxml.Element(doc, key.toLowerCase());
                     var _keys = item[key].split(";");
@@ -88,4 +90,20 @@ exports.get_icons = function(doc) {
 
 exports.save_doc = function(file, doc) {
     fs.writeFileSync(file, doc.toString());
+}
+
+exports.load() = function(dir, callback) {
+    var walker  = walk.walk(dir, { followLinks: false });
+    var desktop_files = [];
+
+    walker.on('file', function(root, stat, next) {
+        if (stat.name.match(/desktop$/g)) {
+            desktop_files.push(root + '/' + stat.name);
+        }
+        next();
+    });
+
+    walker.on('end', function() {
+        callback(desktop_files);
+    });
 }

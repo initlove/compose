@@ -3,8 +3,11 @@ var exec = require('child_process').exec;
 var walk = require('walk');
 var desktopToXml = require('./desktop');
 
+var prepared_dir = '/tmp/dl_app_store';
 var cache_dir = '/tmp/dl_001';
 var base_uri = "http://147.2.207.240/repo/opensuse-12.1-i586/";
+
+var compose_repos = [];
 
 function load_icons(base_uri, cache_dir, required_icons) {
     var icon_dir = cache_dir + '/usr';
@@ -152,7 +155,6 @@ function extra_data(base_uri, cache_dir, rpms, file_pattern, callback) {
             break;
     }
     var child = exec(wget, function(err, stdout, stderr) {
-        if (err) {
             console.log("get error" + err);
             callback(false);
         } else {
@@ -178,6 +180,11 @@ function extra_data(base_uri, cache_dir, rpms, file_pattern, callback) {
         }
     });
 }
+
+exports.prepare_data = function (base_uri, repo_name) {
+    var dir_name = prepared_dir+'/'+encodeURIComponent(base_uri);
+    var dir_cmd = 'rm -fr '+dir_name+' & mkdir -p '+ dir_name;
+};
 
 get_metadata(base_uri, cache_dir);
 //load_desktops(cache_dir);
