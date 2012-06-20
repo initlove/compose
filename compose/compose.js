@@ -27,12 +27,12 @@ function add_repo(req, callback) {
                         callback(false, msg);
                     });
                     monitor.on('status', function(msg) {
-                        console.log('status changed');
+                        console.log('status changed: '+msg);
                         exports.status_change(req.body.base_uri, msg);
                     });
                     monitor.on('done', function(msg) {
-                        console.log(msg);
-                        callback(true);
+                        console.log("done, push the metadata to db");
+                        metadata.push(req, callback);
                     });
                 } else {
                     callback(r,msg);
@@ -49,6 +49,7 @@ exports.add = function(req, res) {
     var base_uri = req.body.base_uri;
     for (var i = 0; i < repo_queue.length; i++) {
         if (repo_queue[i].name == base_uri) {
+            console.log("we have cached this repo");
             if (req.body.reload) {
                 return remove_repo(req, function(r, msg) {
                     if (r) {
@@ -68,7 +69,7 @@ exports.add = function(req, res) {
             }
         }
     }
-    add_repo (req, function(r, msg) {
+    add_repo(req, function(r, msg) {
         if (r) {
             return res.send("The repo: " + base_uri + " success composed");
         } else {

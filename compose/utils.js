@@ -4,6 +4,8 @@ var url = require('url');
 var http = require('http');
 
 exports.prepare_dir = function(dir, callback) {
+    //HACK
+return    callback(true);
     var dir_cmd = "./prepare_dir " + dir;
     var child = exec(dir_cmd, function(err, stdout, stderr) {
         if (err) {

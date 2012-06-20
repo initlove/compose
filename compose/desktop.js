@@ -1,6 +1,6 @@
 var libxml = require("libxmljs");
 var fs = require('fs');
-var file = 'parcellite.desktop';
+var walk = require('walk');
 
 exports.get_desktop = function(file, doc) {
     var content = fs.readFileSync(file).toString();
@@ -9,6 +9,10 @@ exports.get_desktop = function(file, doc) {
         var length = array.length;
         var item = {};
         for (var i = 0; i < length; i++) {
+            if (array[i].match(/#/g)) {
+                /*TODO: just simple way to ignore it */
+                continue;
+            } 
             var key_value = array[i].split("=");
             if (key_value.length == 2) {
                 item[key_value[0]] = key_value[1];
@@ -17,7 +21,6 @@ exports.get_desktop = function(file, doc) {
         if (item["Type"] == null || item["Type"] != "Application") {
             return null;
         } else {
-//            var root = doc.node('applications');
             var elem = libxml.Element(doc, 'application');
             var node = libxml.Element(doc, 'id', file.split('/').pop());
             node.attr({'type': 'desktop'});
@@ -92,7 +95,7 @@ exports.save_doc = function(file, doc) {
     fs.writeFileSync(file, doc.toString());
 }
 
-exports.load() = function(dir, callback) {
+exports.load = function(dir, callback) {
     var walker  = walk.walk(dir, { followLinks: false });
     var desktop_files = [];
 
