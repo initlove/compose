@@ -1,6 +1,7 @@
 var exec = require('child_process').exec;
 var utils = require('./utils');
 var desktop = require('./desktop');
+var walk = require('walk');
 var fs = require('fs');
 var path = require('path');
 var mime = require('mime');
@@ -161,7 +162,6 @@ exports.get = function(req) {
                         }
                         if (found) {
                             extra_data(req, img_rpms, '"*png" "*jpg" "*svg" "*svgz" "*jpeg"', function(r, msg) {
-                                console.log("in other extra ");
                                 if (!r) {
                                     emitter.emit('error', msg);
                                 }
@@ -274,7 +274,7 @@ function save_image(db, filename, path, callback) {
 };
 
 function push_icons(req, callback) {
-    var icon_dir = path.join(utils.data_dir(req.body.base_uri), "/icon/64");
+    var icon_dir = path.join(utils.data_dir(req.body.base_uri), "/icons/64");
 
     var db = new Db('stock', new Server("127.0.0.1", 27017));
     db.open(function(err, db) {
@@ -303,13 +303,18 @@ function push_icons(req, callback) {
 };
 
 function push_apps(req, callback) {
-    var file = utils.data_dir(req)+'/appdata.xml';
-    var content = fs.readFileSync(file).toString();
+    var file = utils.data_dir(req.body.base_uri)+'/appdata.xml';
+    var content = null;
+    try {
+        content = fs.readFileSync(file).toString();
+    } catch (err) {
+        return callback(false, err);
+    }
     var doc = libxml.parseXmlString(content);
     var apps = doc.root().childNodes();
     var data = [];
 
-    for (var i = 0; i < 10 ; i++) {
+    for (var i = 0; i < apps.length ; i++) {
         var elems = apps[i].childNodes();
         var app = {};
         var download = {'pkgrepo': req.body.base_uri};
